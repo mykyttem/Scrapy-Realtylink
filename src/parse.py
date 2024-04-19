@@ -13,38 +13,57 @@ def get_soup_each_pages(link):
     return BeautifulSoup(req_link.content, "html.parser")
 
 
+def get_text_strip(element):
+    return element.get_text(strip=True) if element else None
+
+
+def find_element(soup, selector, attrs=None):
+    return soup.find(selector, attrs)
+
+
 def get_data_from_link(link):
     soup_link = get_soup_each_pages(link)
-    title = soup_link.find("span", {"data-id": "PageTitle"}).get_text(strip=True)
-    full_address = soup_link.find("h2", {"class": "pt-1"}).get_text(strip=True)
-    description = soup_link.find("div", {"itemprop": "description"})
-    description_text = description.get_text(strip=True) if description else None
-    price = soup_link.find("meta", {"itemprop": "price"}).get("content") if soup_link.find("meta", {"itemprop": "price"}) else None
-    area = soup_link.find("div", {"class": "carac-value"}).get_text(strip=True)
-    arr_images = soup_link.find("div", {"class": "primary-photo-container"})
-    number_rooms = soup_link.find("div", {"class": "row teaser"}).get_text(strip=True)
 
-    src_list = [img_tag.get("src") for img_tag in arr_images.find_all("img")] if arr_images else []
+    # Helper function to simplify finding all elements
+    def find_all(element, selector, attrs=None):
+        return element.find_all(selector, attrs)
 
-    # Split the address into separate parts
+    # Helper function to simplify element finding
+    def find(selector, attrs=None):
+        return find_element(soup_link, selector, attrs)
+
+    # Extract data from the page
+    title = get_text_strip(find("span", {"data-id": "PageTitle"}))
+    full_address = get_text_strip(find("h2", {"class": "pt-1"}))
+    description_text = get_text_strip(find("div", {"itemprop": "description"}))
+    price = find("meta", {"itemprop": "price"}).get("content") if find("meta", {"itemprop": "price"}) else None
+    area = get_text_strip(find("div", {"class": "carac-value"}))
+    arr_images = find("div", {"class": "primary-photo-container"})
+    number_rooms = get_text_strip(find("div", {"class": "row teaser"}))
+
+    # Extract image sources
+    src_list = [img_tag.get("src") for img_tag in find_all(arr_images, "img")] if arr_images else []
+
+    # Split the full address into separate parts
     address_parts = full_address.split(',')
     address = ','.join(address_parts[:-1]).strip()
     region = address_parts[-1].strip()
 
     # Extract price history
-    price_history_table = soup_link.find("table", {"class": "table-striped"})
+    price_history_table = find("table", {"class": "table-striped"})
     if price_history_table:
-        rows = price_history_table.find_all("tr")
+        rows = find_all(price_history_table, "tr")  # Corrected the line here
         price_history = []
         for row in rows[1:]:
-            cols = row.find_all("td")
-            date = cols[0].get_text(strip=True)
-            status = cols[1].get_text(strip=True)
-            price = cols[2].get_text(strip=True)
+            cols = find_all(row, "td")  # Corrected the line here
+            date = get_text_strip(cols[0]) 
+            status = get_text_strip(cols[1])
+            price = get_text_strip(cols[2])
             price_history.append({"date": date, "status": status, "price": price})
     else:
         price_history = None
 
+    # Construct the data dictionary
     return {
         "title": title,
         "address": address,
