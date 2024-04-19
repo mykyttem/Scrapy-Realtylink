@@ -2,22 +2,18 @@ from bs4 import BeautifulSoup
 import requests
 import json
 from concurrent.futures import ThreadPoolExecutor
-
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36"
-}
-
-domain = "https://realtylink.org"
+from load_html import get_page_html
+from data import domain, USER_AGENT
 
 
-def get_soup(link):
+def get_soup_each_pages(link):
     full_link = f"{domain}{link}"
-    req_link = requests.get(full_link, headers=HEADERS)
+    req_link = requests.get(full_link, headers=USER_AGENT)
     return BeautifulSoup(req_link.content, "html.parser")
 
 
 def get_data_from_link(link):
-    soup_link = get_soup(link)
+    soup_link = get_soup_each_pages(link)
     title = soup_link.find("span", {"data-id": "PageTitle"}).get_text(strip=True)
     address = soup_link.find("h2", {"class": "pt-1"}).get_text(strip=True)
     description = soup_link.find("div", {"itemprop": "description"})
@@ -41,12 +37,10 @@ def get_data_from_link(link):
     }
 
 
-def parse_main_page(url):
-    req = requests.get(url, headers=HEADERS)
-    soup = BeautifulSoup(req.content, "html.parser")
-    main_result = soup.find_all("div", {"class": "property-thumbnail-item thumbnailItem col-12 col-sm-6 col-md-4 col-lg-3"})
+def parse_main_page():
+    page = get_page_html()
+    main_result = page.find_all("div", {"class": "row thumbnail-content"})
     links = [link.get('href') for result in main_result for link in result.find_all("a", {"class": "a-more-detail"})]
-
     link_data_list = []
 
     with ThreadPoolExecutor() as executor:
