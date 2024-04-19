@@ -23,8 +23,23 @@ def get_page_html():
     blocks = driver.find_element(By.ID, "property-result")
     html_page = blocks.get_attribute("innerHTML")
     
+    # we get the "Next page" button
+    next_button = driver.find_element(By.CSS_SELECTOR, "li.next a")
+    
+    # click counter
+    click_count = 0
+    
+    while next_button and click_count < 6:
+        next_button.click()
+        # update HTML blocks
+        blocks = driver.find_element(By.ID, "property-result")
+        html_page += blocks.get_attribute("innerHTML")
+
+        # check if the "Next page" button is available
+        next_button = driver.find_element(By.CSS_SELECTOR, "li.next a") if driver.find_elements(By.CSS_SELECTOR, "li.next a") else None
+        click_count += 1
+    
     driver.quit()
-
-
+    
     bs4_page = BeautifulSoup(html_page, "html.parser")
     return bs4_page
