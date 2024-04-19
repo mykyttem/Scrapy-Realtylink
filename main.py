@@ -3,9 +3,6 @@ import json
 from src.parse import parse_main_page, save_to_json
 
 
-# TODO: all images src in arr 
-
-
 def count_objects_in_json(filename):
     with open(filename, "r") as f:
         data = json.load(f)
