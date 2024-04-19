@@ -26,11 +26,24 @@ def get_data_from_link(link):
 
     src_list = [img_tag.get("src") for img_tag in arr_images.find_all("img")] if arr_images else []
 
-     
     # Split the address into separate parts
     address_parts = full_address.split(',')
     address = ','.join(address_parts[:-1]).strip()
     region = address_parts[-1].strip()
+
+    # Extract price history
+    price_history_table = soup_link.find("table", {"class": "table-striped"})
+    if price_history_table:
+        rows = price_history_table.find_all("tr")
+        price_history = []
+        for row in rows[1:]: 
+            cols = row.find_all("td")
+            date = cols[0].get_text(strip=True)
+            status = cols[1].get_text(strip=True)
+            price = cols[2].get_text(strip=True)
+            price_history.append({"date": date, "status": status, "price": price})
+    else:
+        price_history = None
 
     return {
         "title": title,
@@ -41,6 +54,7 @@ def get_data_from_link(link):
         "area": area,
         "image_src": src_list,
         "number_rooms": number_rooms,
+        "date": price_history,  
         "link": f"{domain}{link}"
     }
 
