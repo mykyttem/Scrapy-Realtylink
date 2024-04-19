@@ -1,9 +1,10 @@
-from bs4 import BeautifulSoup
 import requests
 import json
 from concurrent.futures import ThreadPoolExecutor
-from load_html import get_page_html
-from data import domain, USER_AGENT
+from bs4 import BeautifulSoup
+
+from .load_html import get_page_html
+from .data import domain, USER_AGENT
 
 
 def get_soup_each_pages(link):

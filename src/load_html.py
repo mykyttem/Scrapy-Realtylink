@@ -4,7 +4,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
-from data import full_link, USER_AGENT
+
+from .data import full_link, USER_AGENT
 
 
 def get_page_html():
