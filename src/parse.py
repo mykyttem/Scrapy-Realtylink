@@ -36,7 +36,7 @@ def get_data_from_link(link):
     if price_history_table:
         rows = price_history_table.find_all("tr")
         price_history = []
-        for row in rows[1:]: 
+        for row in rows[1:]:
             cols = row.find_all("td")
             date = cols[0].get_text(strip=True)
             status = cols[1].get_text(strip=True)
@@ -54,12 +54,15 @@ def get_data_from_link(link):
         "area": area,
         "image_src": src_list,
         "number_rooms": number_rooms,
-        "date": price_history,  
+        "date": price_history,
         "link": f"{domain}{link}"
     }
 
 
 def parse_main_page():
+    """
+        Parse the main page to retrieve links and extract data from property pages.
+    """
     page = get_page_html()
     main_result = page.find_all("div", {"class": "row thumbnail-content"})
     links = [link.get('href') for result in main_result for link in result.find_all("a", {"class": "a-more-detail"})]
@@ -69,7 +72,7 @@ def parse_main_page():
         futures = [executor.submit(get_data_from_link, link) for link in links]
         for future in futures:
             data = future.result()
-            
+
             if data not in link_data_list:
                 link_data_list.append(data)
 
