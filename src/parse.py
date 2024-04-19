@@ -16,7 +16,7 @@ def get_soup_each_pages(link):
 def get_data_from_link(link):
     soup_link = get_soup_each_pages(link)
     title = soup_link.find("span", {"data-id": "PageTitle"}).get_text(strip=True)
-    address = soup_link.find("h2", {"class": "pt-1"}).get_text(strip=True)
+    full_address = soup_link.find("h2", {"class": "pt-1"}).get_text(strip=True)
     description = soup_link.find("div", {"itemprop": "description"})
     description_text = description.get_text(strip=True) if description else None
     price = soup_link.find("meta", {"itemprop": "price"}).get("content") if soup_link.find("meta", {"itemprop": "price"}) else None
@@ -26,9 +26,16 @@ def get_data_from_link(link):
 
     src_list = [img_tag.get("src") for img_tag in arr_images.find_all("img")] if arr_images else []
 
+     
+    # Split the address into separate parts
+    address_parts = full_address.split(',')
+    address = ','.join(address_parts[:-1]).strip()
+    region = address_parts[-1].strip()
+
     return {
         "title": title,
         "address": address,
+        "region": region,
         "description": description_text,
         "price": price,
         "area": area,
