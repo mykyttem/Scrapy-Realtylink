@@ -3,8 +3,7 @@ from src.parse import parse_main_page, save_to_json
 
 
 # TODO: all images src in arr 
-# FIXME: data duplicate
-# TODO: region
+# TODO: 60
 
 
 if __name__ == "__main__":

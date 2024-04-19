@@ -68,7 +68,10 @@ def parse_main_page():
     with ThreadPoolExecutor() as executor:
         futures = [executor.submit(get_data_from_link, link) for link in links]
         for future in futures:
-            link_data_list.append(future.result())
+            data = future.result()
+            
+            if data not in link_data_list:
+                link_data_list.append(data)
 
     return link_data_list
 
