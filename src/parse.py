@@ -52,10 +52,10 @@ def get_data_from_link(link):
     # Extract price history
     price_history_table = find("table", {"class": "table-striped"})
     if price_history_table:
-        rows = find_all(price_history_table, "tr")  # Corrected the line here
+        rows = find_all(price_history_table, "tr") 
         price_history = []
         for row in rows[1:]:
-            cols = find_all(row, "td")  # Corrected the line here
+            cols = find_all(row, "td") 
             date = get_text_strip(cols[0]) 
             status = get_text_strip(cols[1])
             price = get_text_strip(cols[2])
